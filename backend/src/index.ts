@@ -11,15 +11,6 @@ import agencyRoutes from './routes/agency.routes'
 import particularRoutes from './routes/particular.routes'
 import adminRoutes from './routes/admin.routes'
 
-// Cleanup job: eliminar refresh tokens expirados/revocados cada 6 horas
-setInterval(async () => {
-  try {
-    await prisma.refreshToken.deleteMany({
-      where: { OR: [{ revoked: true }, { expiresAt: { lt: new Date() } }] },
-    })
-  } catch { /* silencioso */ }
-}, 6 * 60 * 60 * 1000)
-
 const app = express()
 app.set('trust proxy', 1)
 
@@ -101,8 +92,11 @@ app.get('/health', (_req, res) => res.json({ status: 'ok', service: 'PIB API' })
 // 404
 app.use((_req, res) => res.status(404).json({ error: 'Ruta no encontrada' }))
 
-app.listen(config.port, () => {
-  console.log(`PIB API corriendo en puerto ${config.port} [${config.nodeEnv}]`)
-})
+// Desarrollo local
+if (config.nodeEnv === 'development') {
+  app.listen(config.port, () => {
+    console.log(`PIB API corriendo en puerto ${config.port} [${config.nodeEnv}]`)
+  })
+}
 
 export default app
