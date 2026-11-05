@@ -3,7 +3,8 @@
   "builds": [
     {
       "src": "src/index.ts",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": { "installCommand": "npm install --include=dev && npx prisma generate" }
     },
     {
       "src": "src/cron/cleanup.ts",
